@@ -1,0 +1,83 @@
+Encrypt this message: Must see you over Cadogan West. Coming at once.
+#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+#include &lt;ctype.h&gt;
+#define SIZE 5
+char matrix[SIZE][SIZE] = {
+{&#39;M&#39;, &#39;F&#39;, &#39;H&#39;, &#39;I&#39;, &#39;K&#39;},
+{&#39;U&#39;, &#39;N&#39;, &#39;O&#39;, &#39;P&#39;, &#39;Q&#39;},
+{&#39;Z&#39;, &#39;V&#39;, &#39;W&#39;, &#39;X&#39;, &#39;Y&#39;},
+{&#39;E&#39;, &#39;L&#39;, &#39;A&#39;, &#39;R&#39;, &#39;G&#39;},
+{&#39;D&#39;, &#39;S&#39;, &#39;T&#39;, &#39;B&#39;, &#39;C&#39;}
+};
+void findPosition(char ch, int *row, int *col) {
+if (ch == &#39;J&#39;) ch = &#39;I&#39;;
+for (int i = 0; i &lt; SIZE; i++) {
+for (int j = 0; j &lt; SIZE; j++) {
+if (matrix[i][j] == ch) {
+*row = i;
+*col = j;
+return;
+}
+}
+}
+}
+void encryptPair(char a, char b, char *res) {
+int row1, col1, row2, col2;
+findPosition(a, &amp;row1, &amp;col1);
+findPosition(b, &amp;row2, &amp;col2);
+if (row1 == row2) {
+res[0] = matrix[row1][(col1 + 1) % SIZE];
+res[1] = matrix[row2][(col2 + 1) % SIZE];
+} else if (col1 == col2) {
+res[0] = matrix[(row1 + 1) % SIZE][col1];
+res[1] = matrix[(row2 + 1) % SIZE][col2];
+} else {
+res[0] = matrix[row1][col2];
+res[1] = matrix[row2][col1];
+}
+}
+void prepareText(char text[], char pairs[][2], int *pairCount) {
+char clean[500];
+int len = 0;
+
+for (int i = 0; text[i]; i++) {
+if (isalpha(text[i])) {
+clean[len++] = toupper(text[i] == &#39;J&#39; ? &#39;I&#39; : text[i]);
+}
+}
+int i = 0;
+*pairCount = 0;
+while (i &lt; len) {
+char a = clean[i];
+char b = (i + 1 &lt; len) ? clean[i + 1] : &#39;X&#39;;
+if (a == b) {
+b = &#39;X&#39;;
+i++;
+} else {
+i += 2;
+}
+pairs[*pairCount][0] = a;
+pairs[*pairCount][1] = b;
+(*pairCount)++;
+}
+}
+void encryptMessage(char text[]) {
+char pairs[250][2];
+int count;
+char res[3];
+res[2] = &#39;\0&#39;;
+prepareText(text, pairs, &amp;count);
+printf(&quot;Encrypted Message:\n&quot;);
+for (int i = 0; i &lt; count; i++) {
+encryptPair(pairs[i][0], pairs[i][1], res);
+printf(&quot;%s&quot;, res);
+}
+printf(&quot;\n&quot;);
+}
+int main() {
+char message[] = &quot;Must see you over Cadogan West. Coming at once.&quot;;
+printf(&quot;Original Message:\n%s\n\n&quot;, message);
+encryptMessage(message);
+return 0;
+}
