@@ -1,0 +1,32 @@
+#include &lt;stdio.h&gt;
+#include &lt;ctype.h&gt;
+#include &lt;string.h&gt;
+const char cipherKey[26] = {
+&#39;Q&#39;,&#39;W&#39;,&#39;E&#39;,&#39;R&#39;,&#39;T&#39;,&#39;Y&#39;,&#39;U&#39;,&#39;I&#39;,&#39;O&#39;,&#39;P&#39;,
+&#39;A&#39;,&#39;S&#39;,&#39;D&#39;,&#39;F&#39;,&#39;G&#39;,&#39;H&#39;,&#39;J&#39;,&#39;K&#39;,&#39;L&#39;,&#39;Z&#39;,
+&#39;X&#39;,&#39;C&#39;,&#39;V&#39;,&#39;B&#39;,&#39;N&#39;,&#39;M&#39;
+};
+void encrypt(char* plaintext, char* ciphertext) {
+for (int i = 0; plaintext[i] != &#39;\0&#39;; ++i) {
+char ch = plaintext[i];
+if (isalpha(ch)) {
+int index = tolower(ch) - &#39;a&#39;;
+char cipherChar = cipherKey[index];
+ciphertext[i] = isupper(ch) ? toupper(cipherChar) : tolower(cipherChar);
+} else {
+ciphertext[i] = ch;
+}
+}
+ciphertext[strlen(plaintext)] = &#39;\0&#39;;
+}
+int main() {
+char plaintext[1000], ciphertext[1000];
+printf(&quot;Enter plaintext message: &quot;);
+fgets(plaintext, sizeof(plaintext), stdin);
+// Remove newline
+plaintext[strcspn(plaintext, &quot;\n&quot;)] = &#39;\0&#39;;
+
+encrypt(plaintext, ciphertext);
+printf(&quot;Encrypted message: %s\n&quot;, ciphertext);
+return 0;
+}
