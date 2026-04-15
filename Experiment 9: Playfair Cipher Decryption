@@ -1,0 +1,81 @@
+#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+#include &lt;ctype.h&gt;
+#define SIZE 5
+char matrix[SIZE][SIZE];
+void generateKeyMatrix(char key[]) {
+int used[26] = {0};
+int i, j = 0, k = 0;
+char ch;
+for (i = 0; key[i]; i++) {
+ch = toupper(key[i]);
+if (ch == &#39;J&#39;) ch = &#39;I&#39;;
+if (ch &gt;= &#39;A&#39; &amp;&amp; ch &lt;= &#39;Z&#39; &amp;&amp; !used[ch - &#39;A&#39;]) {
+matrix[k / SIZE][k % SIZE] = ch;
+used[ch - &#39;A&#39;] = 1;
+k++;
+}
+}
+for (i = 0; i &lt; 26; i++) {
+if (i + &#39;A&#39; == &#39;J&#39;) continue;
+if (!used[i]) {
+matrix[k / SIZE][k % SIZE] = i + &#39;A&#39;;
+used[i] = 1;
+k++;
+}
+}
+}
+void findPosition(char ch, int *row, int *col) {
+int i, j;
+if (ch == &#39;J&#39;) ch = &#39;I&#39;;
+for (i = 0; i &lt; SIZE; i++) {
+for (j = 0; j &lt; SIZE; j++) {
+if (matrix[i][j] == ch) {
+*row = i;
+*col = j;
+return;
+}
+}
+}
+
+}
+void decryptPair(char a, char b, char *res) {
+int row1, col1, row2, col2;
+findPosition(a, &amp;row1, &amp;col1);
+findPosition(b, &amp;row2, &amp;col2);
+if (row1 == row2) {
+res[0] = matrix[row1][(col1 + SIZE - 1) % SIZE];
+res[1] = matrix[row2][(col2 + SIZE - 1) % SIZE];
+} else if (col1 == col2) {
+res[0] = matrix[(row1 + SIZE - 1) % SIZE][col1];
+res[1] = matrix[(row2 + SIZE - 1) % SIZE][col2];
+} else {
+res[0] = matrix[row1][col2];
+res[1] = matrix[row2][col1];
+}
+}
+void decryptMessage(char ciphertext[]) {
+char a, b, res[3];
+res[2] = &#39;\0&#39;;
+for (int i = 0; i &lt; strlen(ciphertext); i += 2) {
+a = toupper(ciphertext[i]);
+b = toupper(ciphertext[i + 1]);
+if (a == &#39;J&#39;) a = &#39;I&#39;;
+if (b == &#39;J&#39;) b = &#39;I&#39;;
+decryptPair(a, b, res);
+printf(&quot;%s&quot;, res);
+}
+printf(&quot;\n&quot;);
+}
+int main() {
+char keyword[] = &quot;PLAYFAIR&quot;;
+char message[] =
+&quot;KXJEYUREBEZWEHEWRYTUHEYFS&quot;
+&quot;KREHEGOYFIWTTTUOLKSYCAJPO&quot;
+&quot;BOTEIZONTXBYBNTGONEYCUZWR&quot;
+&quot;GDSONSXBOUYWRHEBAAHYUSEDQ&quot;;
+printf(&quot;Decrypting Playfair Cipher...\n&quot;);
+generateKeyMatrix(keyword);
+decryptMessage(message);
+return 0;
+}
